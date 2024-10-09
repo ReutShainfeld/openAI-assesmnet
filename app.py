@@ -31,5 +31,25 @@ def ask():
     if not question:
         return jsonify({'error': 'No question provided'}), 400
 
+    try:
+        client = OpenAI()
+
+        response = client.chat.completions.create(
+            model="gpt-4o-mini",
+            messages=[
+                {"role": "system", "content": "You are a helpful assistant that answers questions."},
+                {"role": "user", "content": question}
+            ],
+            max_completion_tokens=30
+        )
+
+        print("messages", response.choices[0].message)
+        answer = response.choices[0].message.to_dict()['content']
+
+        return jsonify({'answer': answer}), 200
+
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5015)
