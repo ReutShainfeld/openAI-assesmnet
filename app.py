@@ -8,6 +8,7 @@ from config import Config
 
 
 app = Flask(__name__)
+
 app.config.from_object(Config)
 
 
@@ -18,8 +19,6 @@ with app.app_context():
 
 openai.api_key = Config.OPENAI_API_KEY
 
-
-app = Flask(__name__)
 
 
 
@@ -45,6 +44,10 @@ def ask():
 
         print("messages", response.choices[0].message)
         answer = response.choices[0].message.to_dict()['content']
+
+        qa = QA(question=question, answer=answer)
+        db.session.add(qa)
+        db.session.commit()
 
         return jsonify({'answer': answer}), 200
 
